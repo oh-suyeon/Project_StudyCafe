@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+			PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+			"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="owner"> 
+
+<!-- 지점주 관리 시작 ************************************************************ -->
+<!-- 지점주 정보 리스트 조회 -->
+	<select id="retreieveOwnerList" parameterClass="daily.owner.vo.OwnerCafeInfoVO" resultClass="daily.owner.vo.OwnerCafeInfoVO">
+		SELECT AAA.*
+		FROM(
+			SELECT AA.*
+			FROM (
+					SELECT C.*,  rownum AS rwNum
+					FROM(		
+						
+						SELECT
+							A.owner_id          ownerId   
+							,A.owner_name       ownerName  
+							,A.owner_hp         ownerHp    
+							,A.owner_email      ownerEmail 
+							,A.owner_zip        ownerZip  
+							,A.owner_addr1      ownerAddr1 
+							,A.owner_addr2      ownerAddr2 
+							,A.owner_birth      ownerBirth 
+							,NVL(B.region_name, '생성 대기')      regionName
+							,NVL(B.cafe_name, '생성 대기')		cafeName
+							,NVL(B.run_name, '생성 대기')			runName
+						FROM tb_owner A, 
+							(
+							    SELECT
+									CF.cafe_no             		
+									,CF.owner_id            	
+									,CF.cafe_name         
+									,CF.cafe_tel         
+									,CF.cafe_zip          	
+									,CF.cafe_addr1        	
+									,CF.cafe_addr2         	
+									,CF.cafe_run_code       						
+									,CF.cafe_region_code
+									,CRS.code_name AS region_name
+							        ,CRN.code_name AS run_name
+								FROM tb_cafe CF, tb_code CRS, tb_code CRN
+								WHERE 1=1
+								  AND 'C05' = CRS.group_code(+)
+								  AND CF.cafe_region_code = CRS.code(+)
+							      AND 'C02' = CRN.group_code(+)
+							      AND CF.cafe_run_code = CRN.code(+)
+							) B
+						WHERE A.owner_id = B.owner_id(+)					
+						<dynamic>
+							<isNotEmpty property="ownerName">
+								AND owner_name = #ownerName#
+							</isNotEmpty>
+							<isNotEmpty property="regionName">
+								AND region_name = #regionName#
+							</isNotEmpty>
+							<isNotEmpty property="cafeName">
+								AND cafe_name LIKE '%' || #cafeName# || '%'
+							</isNotEmpty>
+							<isNotEmpty property="runName">
+								AND run_name = #runName#
+							</isNotEmpty>
+						</dynamic>
+						ORDER BY A.owner_id DESC
+						) C
+				) AA
+<!-- 				ORDER BY AA.rwNum DESC -->
+			) AAA
+		WHERE AAA.rwNum BETWEEN #firstRecNo# AND #lastRecNo#
+	</select>
+
+<!-- 지점주 정보 리스트 조회 페이징처리를 위한 카운트 -->
+	<select id="getOwnerCnt" parameterClass="daily.owner.vo.OwnerCafeInfoVO" resultClass="int">
+		SELECT
+			count(*) AS cnt
+		FROM tb_owner A, 
+		(
+		    SELECT
+				CF.cafe_no             		
+				,CF.owner_id            	
+				,CF.cafe_name         
+				,CF.cafe_tel         
+				,CF.cafe_zip          	
+				,CF.cafe_addr1        	
+				,CF.cafe_addr2         	
+				,CF.cafe_run_code       						
+				,CF.cafe_region_code
+				,CRS.code_name AS region_name
+		        ,CRN.code_name AS run_name
+			FROM tb_cafe CF, tb_code CRS, tb_code CRN
+			WHERE 1=1
+			  AND 'C05' = CRS.group_code(+)
+			  AND CF.cafe_region_code = CRS.code(+)
+		      AND 'C02' = CRN.group_code(+)
+		      AND CF.cafe_run_code = CRN.code(+)
+		) B
+		WHERE A.owner_id = B.owner_id(+)					
+		<dynamic>
+			<isNotEmpty property="ownerName">
+				AND owner_name = #ownerName#
+			</isNotEmpty>
+			<isNotEmpty property="regionName">
+				AND region_name = #regionName#
+			</isNotEmpty>
+			<isNotEmpty property="cafeName">
+				AND cafe_name = #cafeName#
+			</isNotEmpty>
+			<isNotEmpty property="runName">
+				AND run_name = #runName#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+
+	<insert id="createOwner" parameterClass="daily.owner.vo.OwnerCafeInfoVO">
+		INSERT INTO TB_OWNER 
+		VALUES (
+			#ownerId#
+			, #ownerPw#
+			, #ownerName#
+			, #ownerHp#
+			, #ownerEmail#
+			, #ownerZip#
+			, #ownerAddr1#
+			, #ownerAddr2#
+			, #ownerBirth#
+		)
+	</insert>
+	
+	<select id="ownerIdCheck" parameterClass="String" resultClass="daily.owner.vo.OwnerCafeInfoVO">
+		SELECT 
+		owner_id          ownerId    
+		,owner_name       ownerName  
+		,owner_hp         ownerHp    
+		,owner_email      ownerEmail 
+		,owner_zip        ownerZip   
+		,owner_addr1      ownerAddr1 
+		,owner_addr2      ownerAddr2 
+		,owner_birth      ownerBirth 
+		FROM tb_owner WHERE owner_id = #ownerId#
+	</select>
+	
+	<select id="getOwner" parameterClass="String" resultClass="daily.owner.vo.OwnerCafeInfoVO">
+		SELECT
+			A.owner_id          ownerId   
+			,A.owner_name       ownerName  
+			,A.owner_hp         ownerHp    
+			,A.owner_email      ownerEmail 
+			,A.owner_zip        ownerZip  
+			,A.owner_addr1      ownerAddr1 
+			,A.owner_addr2      ownerAddr2 
+			,TO_CHAR(A.owner_birth, 'YYYY-MM-DD')      ownerBirth 
+			,NVL(B.region_name, '생성 대기')      regionName
+			,NVL(B.cafe_name, '생성 대기')		cafeName
+			,NVL(B.run_name, '생성 대기')			runName
+		FROM tb_owner A, 
+			(
+			    SELECT
+					CF.cafe_no             		
+					,CF.owner_id            	
+					,CF.cafe_name         
+					,CF.cafe_tel         
+					,CF.cafe_zip          	
+					,CF.cafe_addr1        	
+					,CF.cafe_addr2         	
+					,CF.cafe_run_code       						
+					,CF.cafe_region_code
+					,CRS.code_name AS region_name
+			        ,CRN.code_name AS run_name
+				FROM tb_cafe CF, tb_code CRS, tb_code CRN
+				WHERE 1=1
+				  AND 'C05' = CRS.group_code(+)
+				  AND CF.cafe_region_code = CRS.code(+)
+			      AND 'C02' = CRN.group_code(+)
+			      AND CF.cafe_run_code = CRN.code(+)
+			) B
+		WHERE A.owner_id = B.owner_id(+)
+		  AND A.owner_id = #ownerId#	
+	</select>
+	
+	<delete id="deleteOwner" parameterClass="String">
+		DELETE FROM tb_owner WHERE owner_id = #ownerId#
+	</delete>
+	
+	<update id="updateOwner" parameterClass="daily.owner.vo.OwnerCafeInfoVO">
+		UPDATE tb_owner
+		SET 
+		owner_pw    =  #ownerPw#
+		,owner_name  = #ownerName#
+		,owner_hp    = #ownerHp#
+		,owner_email = #ownerEmail#
+		,owner_zip   = #ownerZip#
+		,owner_addr1 = #ownerAddr1#
+		,owner_addr2 = #ownerAddr2#
+		,owner_birth = #ownerBirth#
+		WHERE owner_id = #ownerId#
+	</update>
+	
+	
+	
+
+	
+</sqlMap>	

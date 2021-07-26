@@ -1,0 +1,11 @@
+@charset "UTF-8";
+
+.smallIcon {
+	display: inline-block;
+	margin-right: 100px;
+	width: 150px;
+}
+
+.smallIcon img {
+	margin-bottom: 30px; 
+}

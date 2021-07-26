@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+			PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+			"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="studyPlan">
+	<select id="retrieveStudyPlanList" parameterClass="String" resultClass="daily.studyplan.vo.StudyPlanVO">
+		SELECT
+			studyplan_no           studyPlanNo
+			,user_id                userId
+			,studyplan_name         studyPlanName
+			,studyplan_start_date   studyPlanStartDate
+			,studyplan_end_date     studyPlanEndDate
+			,plan_type              planType
+			,NVL(description, '')   description
+			,background_color       backgroundColor
+			,text_color             textColor
+			,all_day                allDay
+		FROM tb_studyplanner
+		WHERE 1=1
+		AND user_id = #userId#
+	</select>
+	
+	<insert id="createStudyPlan" parameterClass="daily.studyplan.vo.StudyPlanVO">
+		INSERT INTO tb_studyplanner
+		(
+			studyplan_no          
+			,user_id
+			,studyplan_name       
+			,studyplan_start_date 
+			,studyplan_end_date   
+			,plan_type
+			,description          
+			,background_color     
+			,text_color
+			,all_day              
+		)
+		VALUES
+		(
+			SEQ_STUDYPLAN_NO.NEXTVAL
+			,#userId#
+			,#studyPlanName#     
+			,TO_DATE(#studyPlanStartDate#, 'yyyy-mm-dd hh24:mi')
+			,TO_DATE(#studyPlanEndDate#, 'yyyy-mm-dd hh24:mi')
+			,#planType#
+			,#description#       
+			,#backgroundColor#   
+			,#textColor#
+			,#allDay#        
+		)
+	</insert>
+	
+	<update id="updateStudyPlan" parameterClass="daily.studyplan.vo.StudyPlanVO">
+		UPDATE tb_studyplanner 
+		SET
+			studyplan_name = #studyPlanName#     
+			,studyplan_start_date = TO_DATE(#studyPlanStartDate#, 'yyyy-mm-dd hh24:mi')
+			,studyplan_end_date = TO_DATE(#studyPlanEndDate#, 'yyyy-mm-dd hh24:mi')
+			,plan_type = #planType#
+			,description = #description#       
+			,background_color = #backgroundColor#   
+			,text_color = #textColor#
+			,all_day = #allDay#        
+		WHERE studyplan_no = #studyPlanNo# AND user_id = #userId#
+	</update>
+
+	<delete id="deleteStudyPlan" parameterClass="String">
+		DELETE FROM tb_studyplanner WHERE studyplan_no = #studyPlanNo#
+	</delete>
+
+			
+
+
+
+
+
+</sqlMap>			

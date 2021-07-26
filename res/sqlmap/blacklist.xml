@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+			PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+			"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="blacklist">
+	
+
+
+	<insert id="insertBlacklist" parameterClass="daily.user.vo.BlacklistVO">
+		INSERT INTO TB_BLACKLIST 
+		(
+		BLACKLIST_NO
+		, BLACKLIST_ID
+		, CAFE_NO
+		, USER_ID
+		, BLACKLIST_START_DATE
+		, BLACKLIST_END_DATE
+		, BLACKLIST_REASON
+		, BLACKLIST_DELETE_YN)
+        VALUES(
+        SEQ_BLACKLIST_NO.NEXTVAL
+		,#blacklistId#	        
+		,#cafeNo#	        
+		,#userId#
+        ,SYSDATE
+        ,SYSDATE+10
+        ,#blacklistReason#	        
+		,#blacklistDeleteYn#
+		)
+
+	</insert>
+	
+ 	 	<delete id="deleteBlacklist" parameterClass="String">
+ 	
+ 			delete from TB_BLACKLIST where user_id = #userId#
+ 	
+ 		</delete>
+ 		
+ 		<select id="checkBlacklist" resultClass="int">
+ 	
+ 		select count(*) as yn from TB_BLACKLIST where USER_ID = #userId#
+ 		
+ 	</select>
+
+</sqlMap>			

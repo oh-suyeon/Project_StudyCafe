@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+			PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+			"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="userSeat">
+	
+	<resultMap class="daily.seat.vo.UserSeatVO" id="userSeatMap">
+		<result property="userSeatNo" column="USER_SEAT_NO" />
+		<result property="cafeSeatNo" column="CAFE_SEAT_NO" />
+		<result property="buyTicketNo" column="BUY_TICKET_NO" />
+		<result property="userSeatStartDate" column="USER_SEAT_START_DATE" />
+		<result property="userSeatEndDate" column="USER_SEAT_END_DATE" />
+		<result property="checkInDate" column="CHECK_IN_DATE" />
+		<result property="checkOutDate" column="CHECK_OUT_DATE" />
+		<result property="checkBarcode" column="CHECK_BARCODE" />
+		<result property="roomUserCnt" column="ROOM_USER_CNT" nullValue="1"/>
+		<result property="userId" column="USER_ID" />
+	</resultMap>
+	
+	
+	<!-- 선택한 좌석의 예약 내역 불러오기 -->
+	<!-- 오늘 00시 이후의 모든 예약 내역 --> 
+	<select id="userGetSeatList" resultClass="daily.seat.vo.UserSeatVO" parameterClass="daily.seat.vo.UserSeatVO">
+    	SELECT
+	    	USER_SEAT_NO                  userSeatNo
+			,CAFE_SEAT_NO                 cafeSeatNo
+			,BUY_TICKET_NO                buyTicketNo
+			,USER_SEAT_START_DATE         userSeatStartDate
+			,USER_SEAT_END_DATE           userSeatEndDate
+			,CHECK_IN_DATE                checkInDate
+			,CHECK_OUT_DATE               checkOutDate
+			,CHECK_BARCODE                checkBarcode
+			,NVL(ROOM_USER_CNT, 1)        roomUserCnt
+			,USER_ID					  user_id
+		FROM TB_USER_SEAT 
+		WHERE CAFE_SEAT_NO = #cafeSeatNo#
+		AND (USER_SEAT_START_DATE &gt;= TO_DATE(TO_CHAR(TO_DATE(#userSeatStartDate#, 'YYYY-MM-DD'), 'YYYY-MM-DD'))
+	        AND USER_SEAT_END_DATE &lt;= TO_DATE(TO_CHAR(TO_DATE(#userSeatStartDate#, 'YYYY-MM-DD') + 1, 'YYYY-MM-DD')))
+	</select>
+	
+	
+	<!-- 나의 예약 내역 불러오기 -->
+	<select id="userGetMySeatList" resultClass="daily.seat.vo.UserSeatVO" parameterClass="String">
+		SELECT 
+			USER_SEAT_NO                  userSeatNo
+			,CAFE_SEAT_NO                  cafeSeatNo
+			,BUY_TICKET_NO                 buyTicketNo
+			,USER_SEAT_START_DATE          userSeatStartDate
+			,USER_SEAT_END_DATE            userSeatEndDate
+			,CHECK_IN_DATE                 checkInDate
+			,CHECK_OUT_DATE                checkOutDate
+			,CHECK_BARCODE                 checkBarcode
+			,NVL(ROOM_USER_CNT, 1)        roomUserCnt
+			,USER_ID					  userId
+		FROM TB_USER_SEAT
+		WHERE USER_ID = #userId#
+		ORDER BY USER_SEAT_NO DESC
+	</select>
+	
+	
+	
+	<!-- 나의 진행 중인 예약 정보 불러오기 -->
+	<select id="userGetMySeat" resultClass="daily.seat.vo.UserSeatVO">
+		SELECT 
+			USER_SEAT_NO                  userSeatNo
+			,CAFE_SEAT_NO                  cafeSeatNo
+			,BUY_TICKET_NO                 buyTicketNo
+			,USER_SEAT_START_DATE          userSeatStartDate
+			,USER_SEAT_END_DATE            userSeatEndDate
+			,CHECK_IN_DATE                 checkInDate
+			,CHECK_OUT_DATE                checkOutDate
+			,CHECK_BARCODE                 checkBarcode
+			,NVL(ROOM_USER_CNT, 1)        roomUserCnt
+			,USER_ID					  userId
+		FROM TB_USER_SEAT
+		WHERE USER_ID = #userId#
+			  AND USER_SEAT_START_DATE >= SYSDATE
+		ORDER BY USER_SEAT_NO DESC
+	</select>
+	
+	
+	
+	<!-- 예약 추가 -->
+	<!-- 개인석 -->
+	<insert id="userInsertSeat01" parameterClass="daily.seat.vo.UserSeatVO">
+		INSERT INTO TB_USER_SEAT (
+			USER_SEAT_NO
+			,CAFE_SEAT_NO
+			,USER_SEAT_START_DATE
+			,USER_SEAT_END_DATE
+			,USER_ID
+			)
+		VALUES (
+			SEQ_USER_SEAT_NO.NEXTVAL
+			,#cafeSeatNo#        
+			,TO_DATE(#userSeatStartDate#, 'yyyymmddhh24')
+			,TO_DATE(#userSeatEndDate#, 'yyyymmddhh24')
+			,#userId# 
+		)
+	</insert>
+	
+	<!-- 스터디룸 -->
+	<insert id="userInsertSeat02" parameterClass="daily.seat.vo.UserSeatVO">
+		INSERT INTO TB_USER_SEAT (
+			USER_SEAT_NO
+			,CAFE_SEAT_NO
+			,USER_SEAT_START_DATE
+			,USER_SEAT_END_DATE
+			,ROOM_USER_CNT
+			,#userId# 
+			)
+		VALUES (
+			SEQ_USER_SEAT_NO.NEXTVAL
+			,#cafeSeatNo#        
+			,#userSeatStartDate#
+			,#userSeatEndDate# 
+			,#roomUserCnt# 
+		)
+	</insert>
+	
+	<!-- 예약 정보 수정 -->
+	<!-- 경우1. 체크인, 체크아웃 -->
+	<!-- 경우2. 시간 변경 -->
+	<!-- 경우3. 자리 변경 -->
+	<!-- 경우4. 스터디룸 인원 수 변경 -->
+	
+	<update id="userUpdateSeat" parameterClass="daily.seat.vo.UserSeatVO">
+		UPDATE TB_USER_SEAT SET
+			<isNotEmpty property="checkInDate">
+				AND CHECK_IN_DATE = #checkInDate#
+			</isNotEmpty>  
+			<isNotEmpty property="checkOutDate">
+				AND CHECK_OUT_DATE = #checkOutDate#
+			</isNotEmpty>  
+			<isNotEmpty property="userSeatStartDate">
+				AND USER_SEAT_START_DATE = #userSeatStartDate#
+			</isNotEmpty>  
+			<isNotEmpty property="userSeatEndDate">
+				AND USER_SEAT_END_DATE = #userSeatEndDate#
+			</isNotEmpty>  
+			<isNotEmpty property="cafeSeatNo">
+				AND CAFE_SEAT_NO = #cafeSeatNo#
+			</isNotEmpty>  
+			<isNotEmpty property="roomUserCnt">
+				AND ROOM_USER_CNT = #roomUserCnt#
+			</isNotEmpty>  
+			<isNotEmpty property="roomUserCnt">
+				AND ROOM_USER_CNT = #roomUserCnt#
+			</isNotEmpty>  
+		WHERE USER_SEAT_NO = #userSeatNo#
+	</update>
+	
+	<!-- 예약 정보 수정 -->
+	<!-- ***경우5. 결제 후  BUY_TICKET_NO 업데이트 -->
+	<update id="userUpdateSeatTicketNo" parameterClass="daily.seat.vo.UserSeatVO">
+		UPDATE TB_USER_SEAT SET BUY_TICKET_NO = 
+			(SELECT AA.BUY_TICKET_NO
+			 FROM 
+				(SELECT ROWNUM RN, A.*
+				 FROM
+					(SELECT *
+					 FROM TB_BUY_TICKET 
+					 WHERE USER_ID = #userId#
+					 ORDER BY BUY_TICKET_NO DESC) A) AA
+			WHERE RN = 1)
+		WHERE USER_SEAT_NO = #userSeatNo#
+	</update>
+	
+	<!-- 아이디로 최근 UserSeatNo 알아내기 -->
+	<select id="getUserSeatNo" resultClass="daily.seat.vo.UserSeatVO">
+		SELECT AA.userSeatNo
+			FROM 
+				(SELECT ROWNUM RN, A.userSeatNo
+				FROM
+					(SELECT USER_SEAT_NO userSeatNo
+					FROM TB_USER_SEAT
+					WHERE USER_ID = #userId#
+					ORDER BY USER_SEAT_NO DESC) A) AA
+		WHERE RN = 1
+	</select>
+		
+	<!-- 예약 정보 삭제 -->
+	<delete id="userDeleteSeat" parameterClass="String">
+		DELETE FROM TB_USER_SEAT
+		WHERE USER_SEAT_NO = #userSeatNo#
+	</delete>
+	
+	
+	
+	<!-- 현재 이후의 예약정보가 존재하는지 확인 -->
+	<select id="reservationCnt" resultClass="int">
+		SELECT COUNT(*) CNT
+		FROM TB_USER_SEAT
+		WHERE CAFE_SEAT_NO = #cafeSeatNo#
+			AND SYSDATE &lt;=  USER_SEAT_START_DATE 
+	</select>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+</sqlMap>

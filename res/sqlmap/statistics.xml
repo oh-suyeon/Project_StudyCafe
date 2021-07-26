@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+			PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+			"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="statistics"> 
+
+<!-- 카페 리스트 및 검색을 통한 카페 리스트 -->
+	<select id="currMonthAttendanCnt" parameterClass="string" resultClass="int">
+		select
+			count(*) cnt
+		from tb_studyplanner
+		where 1=1
+		and plan_type = '출석'
+		and to_char(studyplan_start_date, 'yyyymm') = to_char(sysdate, 'yyyymm')
+		and user_id = ##;
+	</select>
+
+</sqlMap>	

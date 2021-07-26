@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Daily Study Cafe - 지점 상세 게시판</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  	<link rel="preconnect" href="https://fonts.gstatic.com">
+  	<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
+	
+	<link href="../../css/common/common.css" type="text/css" rel="stylesheet">
+	<link href="../../css/common/navNFooter.css" type="text/css" rel="stylesheet">
+	
+	<style type="text/css">
+		/**공통**/
+		body, div, a, p, hr {
+			margin : 0px;
+			padding : 0px;
+		}
+		
+		body {
+			font-family: 'Noto Sans KR', sans-serif;
+			font-weight: 700;
+		}
+
+		/**nav1**/
+		.navbar {
+			margin-bottom: 0;
+			border-radius: 0;
+		}
+		
+		#logo {
+			font-weight: 900;
+			color: black;
+		}
+		
+		#logo:hover {
+			color: gray;
+		}
+		
+ 		.icon-bar { 
+ 			background-color: black; 
+ 		} 
+		
+		.navbar-nav>li>a {
+			color: black;
+		}
+		
+		.navbar-nav>li>a:hover {
+ 			color: gray; 
+ 			background-color: white;
+		}
+
+		/**navi2**/
+		#divSecondNavbar {
+			padding-left: 30%; /*가운데 정렬 방법을 못 찾아 임시방편*/
+		}
+
+		/**footer**/
+		footer {
+			font-weight: 300;
+			font-size: 0.8em;
+			padding: 25px;
+		}
+		footer p {
+			margin: 0px;
+		}
+		
+		/**공통2**/
+		.divPadding {
+			padding: 20px 50px;
+		}
+		
+		.alignCenter {
+			text-align: center;
+		}
+		
+		.textUnderline {
+			box-shadow: inset 0 -1px 0 black;
+		}
+		
+		.imgWidth100 {
+			width: 100%;
+		}
+		
+		.fontSize2 {
+			font-size: 1.5em;
+		}
+		
+		.fontSize3 {
+			font-size: 3em;
+		}
+		
+		.fontWeight300 {
+			font-weight: 300;
+		}
+		
+		.marginBottom30 {
+			margin-bottom: 30px;
+		}
+		
+		/**게시판**/
+		.cursorPointer {
+			cursor: pointer;
+		}
+		
+		.divPaging {
+			text-align: center;
+		}
+		
+		.pager, .pagination {
+			display: inline-block;
+			line-height: 20px;
+		}
+		
+		td:hover {
+			background-color: blue;
+		}
+		
+		td {
+			width: 40px; 
+			height: 20px;
+			margin: 0px;
+			padding: 0px;
+		}
+		
+		table, tr, td {
+			
+			border: 1px solid;
+			border-collapse: collapse;		
+		}
+		
+		td div {
+			display: inline-block;
+			width: 40px; 
+			height: 20px; 
+			background-color: black
+		}
+		
+	</style>
+	<script type="text/javascript">
+	
+		$(document).ready(function() {
+			var htmlStr = "";
+			
+			for(var i=0; i<5; i++){
+				htmlStr += "<tr>"
+				for(var j=0; j<5; j++){
+					htmlStr += "<td class='text-center'>"
+							+ "<button type='button' class='btn' onclick='showInfo(this);' value='1'>"
+							+ (i+1) + "," + (j+1)
+							+ "</button>" 
+							+ "</td>"
+				}
+				htmlStr += "</tr>"
+			}
+			
+			$("#tb").html(htmlStr);
+			
+		});
+		
+		function showInfo(obj) {
+			var textStr = $(obj).text();
+			var valStr = $(obj).val();
+			$("#result").html(textStr + valStr);
+			console.log(textStr);
+			console.log(valStr);
+		}
+	
+	</script>
+</head>
+<body>
+	<nav class="navbar">
+		<div class="container">
+
+			<div class="navbar-header">
+
+				<button type="button" class="navbar-toggle" data-toggle="collapse"
+					data-target="#myNavbar">
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span> 
+					<span class="icon-bar"></span>
+				</button>
+
+				<div class="navbar-header">
+					<a id="logo" class="navbar-brand logo" href="#">DAILY</a>
+				</div>
+
+			</div>
+
+			<!-- nav 메뉴 -->
+			<div class="collapse navbar-collapse" id="myNavbar">
+				<ul class="nav navbar-nav">
+					<li class="active"><a href="#">홈</a></li>
+					<li class="active dropdown">
+						<a href="#" class="dropdown-toggle aMainMenu" data-toggle="dropdown" >
+							예약<span class="caret"></span>
+						</a>
+						<ul class="dropdown-menu">
+							<li><a href="#">개인석</a></li>
+							<li><a href="#">스터디룸</a></li>
+						</ul>
+					</li>
+					<li class="active dropdown">
+						<a href="#" class="dropdown-toggle aMainMenu" data-toggle="dropdown" >
+							공지사항<span class="caret"></span>
+						</a>
+						<ul class="dropdown-menu">
+							<li><a href="#">공지사항</a></li>
+							<li><a href="#">시설 및 서비스 안내</a></li>
+						</ul>
+					</li>
+					<li class="active"><a href="#">리뷰</a></li>
+				</ul>
+
+				<ul class="nav navbar-nav navbar-right">
+					<li>
+						<a href="#"><span class="glyphicon glyphicon-user unLoginState"></span> &nbsp;회원가입</a>
+					</li>
+					<li>
+						<a href="#"><span class="glyphicon glyphicon-log-in unLoginState"></span> &nbsp;로그인</a>
+					</li>
+					<li>
+						<a href="#"><span class="glyphicon glyphicon-ok loginState"></span> &nbsp;로그아웃</a>
+					</li>
+				</ul>
+
+			</div>
+			<hr>
+		</div>
+	</nav>
+
+	<!-- 세부 메뉴 nav -->
+
+	<nav class="navbar marginBottom30">
+
+		<div class="container">
+
+			<div class="collapse navbar-collapse" style="text-align: center;">
+				<ul class="nav navbar-nav" style="width: 100%">
+					<li class="active" style="width: calc(100% / 2)"><a href="#">개인석</a></li>
+					<li class="active" style="width: calc(100% / 2)"><a href="#">스터디룸</a></li>
+				</ul>
+			</div>
+			<hr>
+		</div>
+	</nav>
+	
+	<!-- 해당 페이지 내용 -->
+	
+	<div class="container divPadding marginBottom30">
+	
+		<div class="alignCenter">
+			<span class="textUnderline fontSize2">개인석</span>
+		</div>
+		
+		<div class="divPadding">
+			
+			<table id="tb">
+			</table>
+			
+			<div id="result">
+			
+			</div>			
+		</div>
+		
+	</div>
+	
+	<!-- footer -->
+	<footer class="container text-center">
+		<hr class="marginBottom30">
+		<div>
+		  	<p>대표자 : O O O | 사업자 번호 : 555-86-01317</p>
+		  	<p>주소 : 서울시 구로구 디지털로 33길 11 | 연락처 : 02-858-5789</p>
+		</div>
+	</footer>
+</body>
+	
+
+</html>

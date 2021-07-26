@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>🎫이용권구매🎫</title>
+	<style type="text/css">
+	*{margin: 0px;padding: 0px;}	
+	</style>
+	<!-- jquery -->
+	<script  src="http://code.jquery.com/jquery-latest.min.js"></script>
+	<!-- 합쳐지고 최소화된 최신 CSS -->
+	<link rel="stylesheet"	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+	<!-- 부가적인 테마 -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
+	<!-- 합쳐지고 최소화된 최신 자바스크립트 -->
+	<script	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+	<script  src="http://code.jquery.com/jquery-latest.min.js"></script>
+	<!-- iamport.payment.js -->
+	<script src="https://cdn.iamport.kr/js/iamport.payment-1.1.5.js" type="text/javascript"></script>
+	
+	<script type="text/javascript">
+	 IMP.init('imp19732306');
+
+	 function requestPay1() {
+	 IMP.request_pay({
+		    pg : 'kakao',
+		    pay_method : 'card',
+		    merchant_uid : 'merchant_' + new Date().getTime(),
+		    name : '주문명:결제테스트',
+		    amount : 100,
+		    buyer_email : 'iamport@siot.do',
+		    buyer_name : '구매자이름',
+		    buyer_tel : '010-1234-5678',
+		    buyer_addr : '서울특별시 강남구 삼성동',
+		    buyer_postcode : '123-456'
+		}, function(rsp) {
+		    if ( rsp.success ) {
+		        var msg = '결제가 완료되었습니다.';
+		        msg += '고유ID : ' + rsp.imp_uid;
+		        msg += '상점 거래ID : ' + rsp.merchant_uid;
+		        msg += '결제 금액 : ' + rsp.paid_amount;
+		        msg += '카드 승인번호 : ' + rsp.apply_num;
+		        console.log("성공");
+		    } else {
+		        var msg = '결제에 실패하였습니다.';
+		        msg += '에러내용 : ' + rsp.error_msg;
+		        console.log("실패");
+		    }
+
+		    alert(msg);
+		});
+
+	 }
+	 function requestPay2() {
+		 IMP.request_pay({
+			    pg : 'html5_inicis',
+			    pay_method : 'card',
+			    merchant_uid : 'merchant_' + new Date().getTime(),
+			    name : '주문명:결제테스트',
+			    amount : 100,
+			    buyer_email : 'iamport@siot.do',
+			    buyer_name : '구매자이름',
+			    buyer_tel : '010-1234-5678',
+			    buyer_addr : '서울특별시 강남구 삼성동',
+			    buyer_postcode : '123-456'
+			}, function(rsp) {
+			    if ( rsp.success ) {
+			        var msg = '결제가 완료되었습니다.';
+			        msg += '고유ID : ' + rsp.imp_uid;
+			        msg += '상점 거래ID : ' + rsp.merchant_uid;
+			        msg += '결제 금액 : ' + rsp.paid_amount;
+			        msg += '카드 승인번호 : ' + rsp.apply_num;
+			        console.log("성공");
+			    } else {
+			        var msg = '결제에 실패하였습니다.';
+			        msg += '에러내용 : ' + rsp.error_msg;
+			        console.log("실패");
+			    }
+
+			    alert(msg);
+			});
+		 }
+	
+	
+	
+	
+	$(document).ready(function() {
+		 
+		 
+// 		상품유형 
+		 $('input[type="checkbox"][name="productDateType"]').click(function(){
+		  if($(this).prop('checked')){
+		     $('input[type="checkbox"][name="productDateType"]').prop('checked',false);
+		     $(this).prop('checked',true);
+		    }
+		   });
+//	 	시간 유형 
+		 $('input[type="checkbox"][name="productTimeType"]').click(function(){
+		  if($(this).prop('checked')){
+		     $('input[type="checkbox"][name="productTimeType"]').prop('checked',false);
+		     $(this).prop('checked',true);
+		    }
+		   });
+
+// 		쿠폰&마일리지 
+		 $('input[type="checkbox"][name="saleType"]').click(function(){
+		  if($(this).prop('checked')){
+		     $('input[type="checkbox"][name="saleType"]').prop('checked',false);
+		     $(this).prop('checked',true);
+		    }
+		   });
+// 		지불 수단 
+		 $('input[type="checkbox"][name="payType"]').click(function(){
+		  if($(this).prop('checked')){
+		     $('input[type="checkbox"][name="payType"]').prop('checked',false);
+		     $(this).prop('checked',true);
+		    }
+		   });
+ 	
+	
+	
+	
+	// 결제진행 확인 confirm
+ 		$("#payDo").click( function(){
+ 			var res = confirm("결제하시겠습니까?");
+ 			if(res){
+ 				alert("결제 진행!!");
+ 				
+ 				requestPay1();
+ 				
+ 				
+ 			}else{
+ 				alert("결제 취소!!");
+ 			}
+ 		});
+	
+	
+	});
+	
+	// 	취소버튼 클릭시
+	function newPage()  {
+		  window.location.href = 'https://www.naver.com'
+		}
+	</script>
+</head>
+<body>
+	<h1 style="text-align: center;">상품결제</h1>
+	
+	<form action="<%=request.getContextPath() %>/ticketInsert.do" method="post">
+	
+	<!-- 상품 유형 -->
+	<div class="row">
+	  <div class="col-md-3"></div>	
+	  <div class="col-md-6" style="background: #CCFFFF; border: 2px solid; margin-top: 20px; height: 80px; border-radius: 8px;">
+		  	<div>
+		  		 <p>상품유형</p>
+				 <label><input type='checkbox' name='productDateType' value="01" checked="checked"/>당일권</label><!--oneDay -->
+				 <label><input type='checkbox' name='productDateType' value='02' />정기권</label><!--regularDay -->
+		  	</div>
+			
+	  </div>
+	  <div class="col-md-3"></div>
+	</div>
+	
+	<!-- 가격 유형 -->
+		
+	<div class="row">
+	  <div class="col-md-3"></div>	
+	  <div class="col-md-6" style="background: #CCFFFF; border: 2px solid; margin-top: 20px; height: 80px; border-radius: 8px;">
+		  	<div>
+		  		 <p>상품선택</p>
+				 <label><input type='checkbox' name='productTimeType' value='1000' checked="checked"/>1시간/1000원</label>
+				 <label><input type='checkbox' name='productTimeType' value='2000' />2시간/3000원</label>
+				 <label><input type='checkbox' name='productTimeType' value='5000' />4시간/5000원</label>
+				 <label><input type='checkbox' name='productTimeType' value='7000' />6시간/7000원</label>
+				 <label><input type='checkbox' name='productTimeType' value='70000' />2주/70000원</label>
+				 <label><input type='checkbox' name='productTimeType' value='11000' />4주/110000원</label>
+				 <label><input type='checkbox' name='productTimeType' value='7000' />6시간/7000원</label>
+		  	</div>
+			
+	  </div>
+	  <div class="col-md-3"></div>
+	</div>
+	<!-- 마일리지 & 쿠폰  -->
+	<div class="row">
+	  <div class="col-md-3"></div>	
+	  <div class="col-md-6" style="background: #CCFFFF; border: 2px solid; margin-top: 20px; height: 100px; border-radius: 8px;">
+		  	<div>
+		  		 <p>마일리지 & 쿠폰 </p>
+				 <input type='checkbox' name='saleType' value='mileage'/>마일리
+				 <input type='checkbox' name='saleType' value='coupon'/>쿠폰
+				 <input type='checkbox' name='saleType' value='null' checked="checked"/>사용안함
+				 <br>
+				 <input type="text" name="code" placeholder="쿠폰/마일리지 번호를 입력해주세요." style="width: 250px;"/><button onclick="check">사용</button>
+		  	</div>
+			
+	  </div>
+	  <div class="col-md-3"></div>
+	</div>
+	
+	<!-- 결제 수단 -->
+	<div class="row">
+	  <div class="col-md-3"></div>	
+	  <div class="col-md-6" style="background: #CCFFFF; border: 2px solid; margin-top: 20px; height: 80px; border-radius: 8px;">
+		  	
+		  	<div>
+		  		 <p>결제수단</p>
+				 <input type='checkbox' name='payType' value='kakao' checked="checked"/>📱카카오
+				 <input type='checkbox' name='payType' value='card' />💳신용카드
+				 <input type='checkbox' name='payType' value='money' />💰계좌이체
+		  	</div>
+			
+	  </div>
+	  <div class="col-md-3"></div>
+	</div>
+	
+	
+	<div class="row">
+	  <div class="col-md-4"></div>	
+	  <div class="col-md-4" style="margin-top: 20px; height: 80px; text-align: center;">
+		  	<div style="display: inline-block; width: 50%;">
+		  	
+		  		<!-- 결제 -->
+		  		<button  class="btn btn-primary" type="button" id="payDo">결제하기</button>
+				<!-- 취소 메인홈으로가기 -->
+				<button  class="btn btn-default" type="button" onclick="newPage()">취소</button>
+		  	</div>
+			
+	  </div>
+	  <div class="col-md-4"></div>
+	</div>
+	
+	</form>
+</body>
+</html>

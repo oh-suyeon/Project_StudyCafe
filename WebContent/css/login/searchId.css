@@ -1,0 +1,84 @@
+@charset "UTF-8";
+<style>
+	@import url('https://fonts.googleapis.com/css?family=Numans');
+	html, body{
+		height: 100%;
+		font-family: 'Numans', sans-serif;
+	}
+	body{
+		background-image: url('/image/searchPwBg.jpg');
+		background-size: cover;
+		background-repeat: repeat-y;
+	}
+	.container{
+		height: 100%;
+		align-content: center;
+	}
+
+	.card{
+		border: 2px solid rgba(255,255,255,0.8);
+		height: 370px;
+		margin: 25vh auto;
+		width: 400px;
+		background-color: rgba(255,255,255,0.8) !important;
+		text-align: center;
+	}
+	.card-header h3{
+		color: black;
+		font-weight: bold;
+	}
+	.form-horizontal .form-group {
+	    margin-right: auto;
+	    margin-left: auto;
+	}
+	.input-group {
+		display: flex;
+		width: 80%;
+		margin-top: 20px;
+		margin-bottom: 20px;
+	}
+	.input-group-prepend {
+		background-color: #5882FA;
+	 	width: 100px;
+		
+	}
+	 .input-group-prepend span{
+		color: white;
+		font-weight: bold;
+		border:0 !important;
+	}
+
+	.remember{
+		color: white;
+	}
+
+	.remember input
+	{
+		width: 20px;
+		height: 20px;
+		margin-left: 15px;
+		margin-right: 5px;
+		margin-bottom: 20px;
+	}
+
+	.searchId_btn{
+		color: white;
+		background-color: #5882FA;
+		width: 100px;
+		margin-bottom: 20px;
+	}
+
+	.searchId_btn:hover{
+		color: black;
+		background-color: white;
+	}
+
+	.d-flex a{
+		color: black;
+		margin-left: 10px;
+		font-weight: bold;
+		font-size: 1.5rem;
+		text-decoration: underline;
+	}
+	
+</style>

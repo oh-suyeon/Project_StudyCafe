@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+			PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+			"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+			
+<sqlMap namespace="login">
+
+	<select id="loginUser" parameterClass="commonVO" resultClass="userVO">
+		SELECT
+		USER_ID                                userId
+		,USER_PW                               userPw
+		,USER_NAME                             userName
+		,TO_CHAR(USER_BIRTH, 'YYYY-MM-DD')     userBirth
+		,USER_HP                               userHp
+		,USER_PARENT_HP                        userParentHp
+		,USER_EMAIL                            userEmail
+		,USER_ZIP                              userZip
+		,USER_ADDR1                            userAddr1
+		,USER_ADDR2                            userAddr2
+		,NVL(USER_MILEAGE,0)                   userMileage
+		,USER_DELETE_YN                        userDeleteYn
+		,USER_DELETE_DATE                      userDeleteDate
+		,USER_REG_DATE                         userRegDate
+		
+		FROM TB_USER
+		
+		WHERE USER_ID = #commonId#
+		AND USER_PW = #commonPw#
+	</select>
+	
+	<select id="loginAdmin" parameterClass="commonVO" resultClass="adminVO">
+		SELECT
+		ADMIN_ID                                adminId
+		,ADMIN_NAME                             adminName
+		,ADMIN_PW                               adminPw
+		
+		FROM TB_ADMIN
+		
+		WHERE ADMIN_ID = #commonId#
+		AND ADMIN_PW = #commonPw#
+	</select>
+	
+	<select id="loginOwner" parameterClass="commonVO" resultClass="ownerVO">
+		SELECT
+		OWNER_ID                                ownerId
+		,OWNER_PW                               ownerPw
+		,OWNER_NAME                             ownerName
+		,OWNER_HP                               ownerHp
+		,OWNER_EMAIL                            ownerEmail
+		,OWNER_ZIP                              ownerZip
+		,OWNER_ADDR1                            ownerAddr1
+		,OWNER_ADDR2                            ownerAddr2
+		,TO_CHAR(OWNER_BIRTH, 'YYYY-MM-DD')      ownerBirth
+		
+		FROM TB_OWNER
+		
+		WHERE OWNER_ID = #commonId#
+		AND OWNER_PW = #commonPw#
+	</select>
+	
+	
+
+</sqlMap>			

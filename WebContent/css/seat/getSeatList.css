@@ -1,0 +1,17 @@
+@charset "UTF-8";
+
+.seatBtn{
+	width: 80px;
+	height: 30px;
+}
+
+.grayColor {
+	color : gray;	
+}
+
+.ticketDiv{
+	border: 2px solid; 
+	margin-bottom: 20px; 
+	height: 80px; 
+	border-radius: 8px;
+}

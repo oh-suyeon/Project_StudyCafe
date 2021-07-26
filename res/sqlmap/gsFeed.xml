@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+			PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+			"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="gsFeed">
+
+
+	<update id="updateFd" parameterClass="daily.gsFeed.vo.GsFeedVO"> 
+	
+		UPDATE TB_GS_FEED
+		SET GS_FEED_TITLE = #gsFeedTitle#
+		,USER_ID = #userId#
+		,GS_FEED_CONTENT = #gsFeedContent#
+		,ATCH_FILE_ID = #atchFileId#
+		WHERE GS_FEED_NO = #gsFeedNo#
+	
+	</update> 
+
+	<delete id="deleteFd" parameterClass="String">
+		
+		DELETE FROM TB_GS_FEED WHERE GS_FEED_NO = #gsFeedNo#
+		
+	</delete>
+
+	<insert id="insertFd" parameterClass="daily.gsFeed.vo.GsFeedVO">
+	
+	INSERT INTO TB_GS_FEED (GS_FEED_NO
+	,USER_ID
+	,GS_FEED_TITLE
+	,GS_FEED_CONTENT
+	,GS_FEED_DATE
+	,ATCH_FILE_ID)
+	VALUES (SEQ_GS_FEED_NO.NEXTVAL
+	,#userId#
+	,#gsFeedTitle#
+	,#gsFeedContent#
+	,SYSDATE
+	,#atchFileId#)
+	</insert>
+
+	<resultMap class="gsFeedVO"       id="gsFeedMap">
+		<result property="gsFeedNo"             column="gs_feed_no"/>
+		<result property="gsRecruitNo"          column="gs_recruit_no"/>
+		<result property="userId"               column="user_id"/>
+		<result property="gsFeedTitle"          column="gs_feed_title"/>
+		<result property="gsFeedContent"        column="gs_feed_content"/>
+		<result property="gsFeedDate"           column="gs_feed_date"/>
+		<result property="atchFileId"           column="atch_file_id"/>
+		<result property="boardCode"            column="board_code"/>
+	</resultMap>
+	
+	<select id="getAllGsFeedList" resultClass="daily.gsFeed.vo.GsFeedVO">
+		
+		SELECT 
+			 GS_FEED_NO      gsFeedNo         
+			,GS_RECRUIT_NO   gsRecruitNo     
+			,USER_ID         userId           
+			,GS_FEED_TITLE   gsFeedTitle      
+			,GS_FEED_CONTENT gsFeedContent    
+			,GS_FEED_DATE    gsFeedDate       
+			,a.ATCH_FILE_ID    atchFileId       
+			,BOARD_CODE      boardCode        
+		    ,b.FILE_ORIGINAL_NAME	fileOriginalName
+            ,b.FILE_NAME      fileName  
+        FROM TB_GS_FEED a, tb_atch_file_detail b
+		WHERE a.ATCH_FILE_ID = b.ATCH_FILE_ID
+		ORDER BY GS_FEED_NO DESC   
+                                 
+	</select>
+
+	<select id="getGsFeed" parameterClass="String" resultClass="daily.gsFeed.vo.GsFeedVO">
+   
+      SELECT 
+       		GS_FEED_NO      gsFeedNo         
+			,GS_RECRUIT_NO   gsRecruitNo     
+			,USER_ID         userId           
+			,GS_FEED_TITLE   gsFeedTitle      
+			,GS_FEED_CONTENT gsFeedContent    
+			,GS_FEED_DATE    gsFeedDate       
+			,a.ATCH_FILE_ID    atchFileId       
+			,BOARD_CODE      boardCode        
+		    ,b.FILE_ORIGINAL_NAME	fileOriginalName
+            ,b.FILE_NAME      fileName  
+      FROM TB_GS_FEED a, tb_atch_file_detail b
+      WHERE   a.ATCH_FILE_ID = b.ATCH_FILE_ID 
+       AND a.GS_FEED_NO = #gsFeedNo#
+   
+   </select>
+   
+	<select id="getTotalCnt" resultClass="int">
+		
+		SELECT COUNT(*) AS CNT 
+		FROM TB_GS_FEED
+		
+	</select>
+</sqlMap>

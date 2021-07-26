@@ -1,0 +1,74 @@
+@charset "UTF-8";
+
+body, div, a, p, hr, img {
+	margin : 0px;
+	padding : 0px;
+}
+
+body {
+	font-family: 'Noto Sans KR', sans-serif;
+	font-weight: 700;
+}
+
+
+
+/* 간단하게 스타일을 적용하고 싶을 때 사용 */
+
+/*divPadding : 페이지에 내용이 너무 꽉차지 않도록 div에 적용*/
+.divPadding {
+	padding: 0px 50px;
+}
+
+.alignCenter {
+	text-align: center;
+}
+
+.textUnderline {
+	box-shadow: inset 0 -1px 0 black;
+}
+
+.imgWidth100 {
+	width: 100%;
+}
+
+.fontBlack {
+	color: black;
+}
+
+.fontSize2 {
+	font-size: 1.5em;
+}
+
+.fontSize3 {
+	font-size: 3em;
+}
+
+.fontWeight300 {
+	font-weight: 300;
+}
+
+.fontWeight700 {
+	font-weight: 700;
+}
+
+.marginTop30 {
+	margin-top: 30px;
+}
+
+.marginBottom30 {
+	margin-bottom: 30px;
+}
+
+.marginRight100 {
+	margin-right: 100px;
+}
+
+.inlineBlock {
+	display: inline-block;
+}
+
+
+/**게시판**/
+.cursorPointer {
+	cursor: pointer;
+}

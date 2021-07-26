@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+			PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+			"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="review">
+ 	
+ 	
+<insert id="insertReview" parameterClass="daily.review.vo.ReviewVO">
+ 		
+ 		INSERT INTO TB_CAFE_REVIEW
+		(REVIEW_NO
+		,USER_ID
+		,REVIEW_TITLE
+		,REVIEW_CONTENT
+		,REVIEW_REG_DATE
+		,ATCH_FILE_ID
+		,BOARD_CODE
+		,CAFE_NO
+		)
+values (
+		SEQ_REVIEW_NO.nextval
+		,#userId#
+		,#reviewTitle#
+		,#reviewContent#
+		,(select TO_CHAR(SYSDATE,'YYYY/MM/DD') TB_ATCH_FILE from dual)
+		,#atchFileId#
+		,#boardCode#
+		,#cafeNo#)
+ 	</insert>
+ 	
+ 	<update id="updateReview" parameterClass="daily.review.vo.ReviewVO">
+ 	
+ 		update TB_CAFE_REVIEW
+		set	
+			REVIEW_TITLE      = #reviewTitle#
+			,REVIEW_CONTENT    = #reviewContent#
+			,REVIEW_REG_DATE   = (select TO_CHAR(SYSDATE,'YYYY/MM/DD') TB_ATCH_FILE from dual)
+			,ATCH_FILE_ID      = #atchFileId#
+			,BOARD_CODE        = #boardCode#
+			,CAFE_NO           = #cafeNo#
+		where REVIEW_NO 	 = #reviewNo#
+		
+ 	
+ 	</update>
+ 	
+ 	 	<delete id="deleteReview" parameterClass="String">
+ 	
+ 		delete from TB_CAFE_REVIEW where REVIEW_NO = #reviewNo#
+ 	
+ 		</delete>
+
+
+	<resultMap class="reviewVO" id="reviewMap">
+ 		<result property="reviewNo"          column="REVIEW_NO"  	  />  
+ 		<result property="userId"            column="USER_ID"   	  />   
+ 		<result property="reviewTitle" 		 column="REVIEW_TITLE"    />
+ 		<result property="reviewContent"     column="REVIEW_CONTENT"  />
+ 		<result property="reviewRegDate"     column="REVIEW_REG_DATE" />
+ 		<result property="atchFileId"        column="ATCH_FILE_ID"  nullValue="0"  />
+ 		<result property="boardCode"         column="BOARD_CODE"      />
+ 		<result property="cafeNo"            column="CAFE_NO"         />
+ 	</resultMap>
+
+
+ 	<select id="getReviewAll" resultMap="reviewMap">
+ 		
+ 		select AA.*
+		from
+		(select A.*, rownum as rnum
+		from 
+		(select REVIEW_NO 
+		,USER_ID 
+		,REVIEW_TITLE 
+		,REVIEW_CONTENT 
+		,TO_CHAR(REVIEW_REG_DATE, 'YYYY-MM-DD') REVIEW_REG_DATE 
+		,ATCH_FILE_ID 
+		,BOARD_CODE
+		,CAFE_NO
+		from TB_CAFE_REVIEW
+		order by REVIEW_NO desc) A ) AA
+		where AA.rnum between #firstRecNo# and #lastRecNo#
+ 		
+ 	</select>
+ 	
+ 	<select id="getTotalCnt" resultClass="int">
+ 		
+ 		select count(*) as cnt
+		from TB_CAFE_REVIEW
+ 	
+ 	</select>
+ 	
+ 	
+ 	<select id="checkReview" resultClass="int">
+ 	
+ 		select count(*) as cnt from TB_CAFE_REVIEW where user_id userId = #userId#
+ 		
+ 	</select>
+
+ 	<select id="getReview" resultMap="reviewMap">
+ 	
+ 		select *  from TB_CAFE_REVIEW where user_id = #userId#
+ 		
+ 	</select>
+ 	
+ 	 	<select id="getReview2" resultMap="reviewMap">
+ 	
+ 		select *  from TB_CAFE_REVIEW where REVIEW_TITLE = #reviewTitle#
+ 		
+ 	</select>
+ 	
+ 	<select id="getReviewNo" resultMap="reviewMap">
+ 	
+ 		select *  from TB_CAFE_REVIEW where REVIEW_NO = #reviewNo#
+ 		
+ 	</select>
+
+ 	
+</sqlMap>			
+
+
+
+
+

@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+			PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+			"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="cafe"> 
+
+<!-- 카페 리스트 및 검색을 통한 카페 리스트 -->
+	<select id="retreieveCafeList" parameterClass="daily.cafe.vo.CafeRegionNameVO" resultClass="daily.cafe.vo.CafeRegionNameVO">
+		SELECT AA.*
+		FROM (
+				SELECT C.*,  rownum AS rnum
+				FROM(		
+					SELECT
+						A.cafe_no              cafeNo 		
+						,A.owner_id            ownerId 		
+						,A.cafe_name           cafeName 	
+						,A.cafe_tel            cafeTel 		
+						,A.cafe_zip            cafeZip 		
+						,A.cafe_addr1          cafeAddr1 	
+						,A.cafe_addr2          cafeAddr2 	
+						,A.cafe_run_code       cafeRunCode
+                        ,C.code_name           cafeRunName
+						,TO_CHAR(A.cafe_x_position)     cafeXPosition
+						,TO_CHAR(A.cafe_y_position)     cafeYPosition
+						,A.cafe_region_code    cafeRegionCode
+						,B.code_name		   cafeRegionName
+					FROM (
+							select
+							    TO_NUMBER(cafe_no) cafe_no
+							    ,owner_id
+							    ,cafe_name
+							    ,cafe_tel
+							    ,cafe_zip
+							    ,cafe_addr1
+							    ,cafe_addr2
+							    ,cafe_run_code
+							    ,cafe_x_position
+							    ,cafe_y_position
+							    ,cafe_region_code
+							from tb_cafe
+						) A, tb_code B, tb_code C
+					WHERE 1=1
+					  AND 'C05' = b.group_code(+)
+			          AND a.cafe_region_code = b.code(+)
+                      AND 'C02' = c.group_code(+)
+                      AND a.cafe_run_code = c.code(+)
+					<dynamic>
+						<isNotEmpty property="cafeRegionCode">
+							AND cafe_region_code = #cafeRegionCode#
+						</isNotEmpty>
+						<isNotEmpty property="cafeName">
+							AND cafe_name LIKE '%' || #cafeName# || '%'
+						</isNotEmpty>
+						<isNotEmpty property="cafeAddr1">
+							AND cafe_addr1 LIKE '%'|| #cafeAddr1# || '%'
+						</isNotEmpty>
+					</dynamic>
+					ORDER BY A.cafe_no DESC
+					) C
+			) AA
+		WHERE AA.rnum BETWEEN #firstRecNo# AND #lastRecNo#
+	</select>
+
+<!-- 카페 리스트 페이징 처리 -->
+	<select id="getCafeCnt" parameterClass="daily.cafe.vo.CafeRegionNameVO" resultClass="int">
+		SELECT
+			count(*) AS cnt
+        FROM tb_cafe A, tb_code B, tb_code C
+		WHERE 1=1
+		  AND 'C05' = b.group_code(+)
+          AND a.cafe_region_code = b.code(+)
+          AND 'C02' = c.group_code(+)
+          AND a.cafe_run_code = c.code(+)
+		<dynamic>
+			<isNotEmpty property="cafeRegionCode">
+				AND cafe_region_code = #cafeRegionCode#
+			</isNotEmpty>
+			<isNotEmpty property="cafeName">
+				AND cafe_name = #cafeName#
+			</isNotEmpty>
+			<isNotEmpty property="cafeAddr1">
+				AND cafe_addr1 LIKE '%'|| #cafeAddr1# || '%'
+			</isNotEmpty>
+		</dynamic>
+	</select>
+
+<!-- 카페 번호를 통한 지점 조회 -->
+	<select id="retreieveCafe" parameterClass="String" resultClass="daily.cafe.vo.CafeRegionNameVO">
+		SELECT
+			A.cafe_no              cafeNo 		
+			,A.owner_id            ownerId 		
+			,A.cafe_name           cafeName 	
+			,A.cafe_tel            cafeTel 		
+			,A.cafe_zip            cafeZip 		
+			,A.cafe_addr1          cafeAddr1 	
+			,A.cafe_addr2          cafeAddr2 	
+			,A.cafe_run_code       cafeRunCode
+			,C.code_name           cafeRunName	
+			,TO_CHAR(A.cafe_x_position)     cafeXPosition
+			,TO_CHAR(A.cafe_y_position)     cafeYPosition
+			,A.cafe_region_code    cafeRegionCode
+			,B.code_name		   cafeRegionName
+		FROM tb_cafe A, tb_code B, tb_code C
+		WHERE 1=1
+		  AND 'C05' = b.group_code(+)
+          AND a.cafe_region_code = b.code(+)
+          AND 'C02' = c.group_code(+)
+          AND a.cafe_run_code = c.code(+)
+		  AND cafe_no = #cafeNo#
+	</select>
+	
+<!-- 	카페 지점별 안내 소개 정보 -->
+	<select id="cafeIntroduce" parameterClass="String" resultClass="daily.cafe.vo.CafeIntroduceVO">
+		SELECT
+			introduce_no		introduceNo
+			,introduce_code     introduceCode
+			,introduce_content  introduceContent
+			,atch_file_id       atch_fileId
+			,admin_id           adminId
+			,cafe_no            cafeNo
+		FROM tb_cafe_introduce A
+		WHERE cafe_no = #cafeNo#
+	</select>
+	
+<!-- 	지점 생성 -->
+	<insert id="createCafe" parameterClass="daily.cafe.vo.CafeVO">
+		INSERT INTO tb_cafe
+		(
+			cafe_no         
+			,owner_id       
+			,cafe_name      
+			,cafe_tel        	
+			,cafe_zip       
+			,cafe_addr1     
+			,cafe_addr2     
+			,cafe_run_code   
+			<dynamic>
+				<isNotEmpty property="cafeXPosition">
+					,cafe_x_position 
+				</isNotEmpty>
+				<isNotEmpty property="cafeYPosition">
+					,cafe_y_position 
+				</isNotEmpty>
+			</dynamic>
+			,cafe_region_code 
+		)
+		VALUES(
+			SEQ_CAFE_NO.NEXTVAL
+			,#ownerId#
+			,#cafeName#
+			,#cafeTel#
+			,#cafeZip#
+			,#cafeAddr1#
+			,#cafeAddr2#
+			,#cafeRunCode#
+			<dynamic>
+				<isNotEmpty property="cafeXPosition">
+					,#cafeXPosition#
+				</isNotEmpty>
+				<isNotEmpty property="cafeYPosition">
+					,#cafeYPosition#
+				</isNotEmpty>
+			</dynamic>
+			,#cafeRegionCode#
+		)
+	</insert>
+	
+<!-- 	지점 생성시 지점주 계정정보 선택하기 위한 지점주 전체 리스트 조회 -->
+	<select id="retreieveOwnerList" resultClass="daily.owner.vo.OwnerVO">
+		SELECT
+		owner_id ownerId
+		,owner_name ownerName
+		FROM tb_owner
+		ORDER BY owner_id DESC
+	</select>
+	
+	<update id="updateCafe" parameterClass="daily.cafe.vo.CafeVO">
+		UPDATE tb_cafe
+		SET
+			owner_id = #ownerId#
+			,cafe_name = #cafeName#
+			,cafe_tel = #cafeTel#
+			,cafe_zip = #cafeZip#
+			,cafe_addr1 = #cafeAddr1#
+			,cafe_addr2 = #cafeAddr2#
+			,cafe_run_code = #cafeRunCode#
+			,cafe_x_position = #cafeXPosition#
+			,cafe_y_position = #cafeYPosition#
+			,cafe_region_code = #cafeRegionCode#
+		WHERE cafe_no = #cafeNo#
+	</update>
+	
+	<delete id="deleteCafe" parameterClass="String">
+		DELETE FROM tb_cafe WHERE cafe_no = #cafeNo#
+	</delete>
+	
+	
+	<!-- 지점주 아이디로 지점 조회 -->
+	<select id="getCafeToSeat" resultClass="daily.cafe.vo.CafeVO">
+		SELECT CAFE_NO cafeNo
+		FROM TB_CAFE
+		WHERE OWNER_ID = #ownerId#
+	</select>
+	
+</sqlMap>	

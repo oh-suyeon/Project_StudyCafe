@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+			PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+			"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="atchFile">
+ 	
+ 	<resultMap class="daily.common.vo.AtchFileVO" id="atchFileMap">
+ 		<result property="atchFileId" column="ATCH_FILE_ID" />
+ 		<result property="fileSn" column="FILE_SN" />
+ 		<result property="fileStreCours" column="FILE_STRE_COURS" />
+ 		<result property="fileName" column="FILE_NAME" />
+ 		<result property="fileOriginalName" column="FILE_ORIGINAL_NAME" />
+ 		<result property="fileExtsn" column="FILE_EXTSN" />
+ 		<result property="fileContent" column="FILE_CONTENT" />
+ 		<result property="fileSize" column="FILE_SIZE" />
+ 	</resultMap>
+ 	
+ 	
+ 	<select id="getAtchFileList" parameterClass="daily.common.vo.AtchFileVO"
+ 									resultMap="atchFileMap">
+ 		
+ 		select * from TB_ATCH_FILE_DETAIL
+ 		where atch_file_id = #atchFileId#
+ 	
+ 	</select>
+ 	
+ 	<select id="getAtchFileDetail" parameterClass="daily.common.vo.AtchFileVO"
+ 									resultMap="atchFileMap">
+ 		
+ 		select * from TB_ATCH_FILE_DETAIL
+ 		where atch_file_id = #atchFileId# 
+ 			and file_sn = #fileSn#
+ 	
+ 	</select>
+ 	
+ 	<insert id="insertAtchFile" parameterClass="daily.common.vo.AtchFileVO">
+ 		
+ 		<selectKey keyProperty="atchFileId" resultClass="long">
+ 			select SEQ_ATCH_FILE_ID.nextval from dual
+ 		</selectKey>
+ 		
+ 		insert into TB_ATCH_FILE
+ 		(
+	 		ATCH_FILE_ID
+			,ATCH_CREAT_DATE
+			,ATCH_USE_AT
+ 		)
+ 		values
+ 		(
+	 		#atchFileId#
+	 		,sysdate
+	 		,'Y'
+ 		)
+ 		
+ 	</insert>
+ 	
+ 	<insert id="insertAtchFileDetail">
+ 	
+ 		insert into TB_ATCH_FILE_DETAIL
+ 		(
+ 		ATCH_FILE_ID
+		,FILE_SN
+		,FILE_STRE_COURS
+		,FILE_NAME
+		,FILE_ORIGINAL_NAME
+		,FILE_EXTSN
+		,FILE_CONTENT
+		,FILE_SIZE
+ 		)
+ 		values
+ 		(
+ 		#atchFileId#
+		,(select nvl(max(file_sn), 0)
+	     from TB_ATCH_FILE_DETAIL
+	     where atch_file_id = #atchFileId#)
+		,#fileStreCours#
+		,#fileName#
+		,#fileOriginalName#
+		,#fileExtsn#
+		,#fileContent#
+		,#fileSize#
+ 		)
+ 		
+ 	</insert>
+
+ 	
+</sqlMap>			

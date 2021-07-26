@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+			PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+			"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="ticket">
+	
+	<insert id="insertTicket" parameterClass="daily.ticket.vo.TicketVO">
+		INSERT INTO TB_BUY_TICKET(              
+			BUY_TICKET_NO                       
+			,TICKET_NO                          
+			,CAFE_NO                            
+			,USER_ID                            
+			,BUY_TICKET_DATE                    
+			,BUY_CODE                           
+			,BUY_AMOUNT                         
+			,USER_COUPON_NO                     
+			,BUY_COUPON_AMOUNT                  
+			,BUY_MILEAGE                        
+			,BUY_REAL_AMOUNT                    
+			,BUY_REFUND_YN                      
+			,BUY_REFUND_REASON                  
+			)                                   
+			VALUES(                             
+												
+
+			 SEQ_BUY_TICKET_NO.NEXTVAL
+			,#ticketNo#
+			,#cafeNo#
+			,#userId#
+			,SYSDATE
+			,#buyCode#
+			,#buyAmount#
+			,#userCouponNo#
+			,#buyCouponAmount#
+			,#buyMileage#
+			,#buyRealAmount#
+			,#buyRefundYn#
+			,#buyRefundReason#
+			)
+	</insert>
+	<resultMap  class="ticketVO" id="ticketMap">
+		
+		<result property="buyTicketNo"		column="BUY_TICKET_NO"          />
+		<result property="ticketNo"		column="TICKET_NO"	                />
+		<result property="cafeNo"		column="CAFE_NO"	                />
+		<result property="userId"		column="USER_ID"	                />
+		<result property="buyTicketDate"		column="BUY_TICKET_DATE"	/>
+		<result property="buyCode"		column="BUY_CODE"	                />
+		<result property="buyAmount"		column="BUY_AMOUNT"	            />
+		<result property="userCouponNo"		column="USER_COUPON_NO"	        />
+		<result property="buyCouponAmount"		column="BUY_COUPON_AMOUNT"	/>
+		<result property="buyMileage"		column="BUY_MILEAGE"	        />
+		<result property="buyRealAmount"		column="BUY_REAL_AMOUNT"	/>
+		<result property="buyRefundYn"		column="BUY_REFUND_YN"	        />
+		<result property="buyRefundReason"		column="BUY_REFUND_REASON"  />
+	</resultMap>
+	
+	<select id="getAllTicket" resultMap="ticketMap">
+ 		select AA.*
+		from
+		(select A.*, rownum as rnum
+		from 
+		(select BUY_TICKET_NO
+		,TICKET_NO
+		,CAFE_NO
+		,USER_ID
+		,BUY_TICKET_DATE
+		,BUY_CODE
+		,BUY_AMOUNT
+		,USER_COUPON_NO
+		,BUY_COUPON_AMOUNT
+		,BUY_MILEAGE
+		,BUY_REAL_AMOUNT
+		,BUY_REFUND_YN
+		,BUY_REFUND_REASON
+		from TB_BUY_TICKET ) A ) AA
+		where AA.rnum between #firstRecNo# and #lastRecNo#
+	
+	</select>
+	
+ 	<select id="getTotalCnt" resultClass="int">
+ 		
+ 		select count(*) as cnt
+		from TB_BUY_TICKET
+ 	
+ 	</select>
+ 	
+ 	<!-- 이용권 최종 결제 전 결제정보 확인을 위함 -->
+ 	<select id="choiceTicketInfo" parameterClass="daily.ticket.vo.ChoiceTicketInfoVO" resultClass="daily.ticket.vo.ChoiceTicketInfoVO">
+		SELECT 
+		seat_code seatCode
+		,decode(ticket_name, '03', ticket_time||'주', ticket_time||'시간') ticketTime
+		,ticket_price ticketPrice
+		,b.code  ticketType
+		,b.code_name ticketTypeTime
+		FROM tb_ticket a, tb_code b
+		WHERE 'C04' = b.group_code(+)
+		  AND a.ticket_name = b.code(+)
+		  AND a.ticket_name = #ticketType#
+		  AND a.ticket_price = #ticketPrice#
+ 	</select>
+
+
+	<!-- 결제 정보 띄워주기위해 butTicketNo 입력해 결제 정보 가져오기  -->
+<!-- 	<select id="getBuyTicketInfo" resultClass="daily.ticket.vo.TicketVO"> -->
+<!-- 		SELECT  -->
+<!-- 			BUY_TICKET_NO                    buyTicketNo                           -->
+<!-- 			,TICKET_NO                       ticketNo                              -->
+<!-- 			,CAFE_NO                         cafeNo                                -->
+<!-- 			,USER_ID                         userId                                -->
+<!-- 			,BUY_TICKET_DATE                 buyTicketDate                        -->
+<!-- 			,BUY_CODE                        buyCode                               -->
+<!-- 			,BUY_AMOUNT                      buyAmount                             -->
+<!-- 			,USER_COUPON_NO                  userCouponNo                         -->
+<!-- 			,BUY_COUPON_AMOUNT               buyCouponAmount                      -->
+<!-- 			,BUY_MILEAGE                     buyMileage                            -->
+<!-- 			,BUY_REAL_AMOUNT                 buyRealAmount                        -->
+<!-- 			,BUY_REFUND_YN                   buyRefundYn                          -->
+<!-- 			,BUY_REFUND_REASON               buyRefundReason        -->
+<!-- 		FROM TB_BUY_TICKET -->
+<!-- 		WHERE BUY_TICKET_NO = #buyTicketNo# -->
+<!-- 	</select> -->
+	<select id="getBuyTicketInfo" resultClass="daily.ticket.vo.TicketCafeNameVO">
+		SELECT 
+			T.BUY_TICKET_NO                    buyTicketNo                          
+			,T.TICKET_NO                       ticketNo                             
+			,T.CAFE_NO                         cafeNo
+			,T.USER_ID                         userId                               
+			,T.BUY_TICKET_DATE                 buyTicketDate                       
+			,T.BUY_CODE                        buyCode                              
+			,T.BUY_AMOUNT                      buyAmount                            
+			,T.USER_COUPON_NO                  userCouponNo                        
+			,T.BUY_COUPON_AMOUNT               buyCouponAmount                     
+			,T.BUY_MILEAGE                     buyMileage                           
+			,T.BUY_REAL_AMOUNT                 buyRealAmount                       
+			,T.BUY_REFUND_YN                   buyRefundYn                         
+			,T.BUY_REFUND_REASON               buyRefundReason
+			,C.CAFE_NAME					   cafeName       
+		FROM TB_BUY_TICKET T, TB_CAFE C
+		WHERE BUY_TICKET_NO = #buyTicketNo#
+			  AND T.CAFE_NO = C.CAFE_NO 
+		GROUP BY T.CAFE_NO, C.CAFE_NAME
+				,T.BUY_TICKET_NO, T.TICKET_NO, T.CAFE_NO, T.USER_ID
+				,T.BUY_TICKET_DATE, T.BUY_CODE, T.BUY_AMOUNT, T.USER_COUPON_NO, T.BUY_COUPON_AMOUNT 
+				,T.BUY_MILEAGE, T.BUY_REAL_AMOUNT, T.BUY_REFUND_YN, T.BUY_REFUND_REASON        	
+	</select>
+	
+	
+</sqlMap>			

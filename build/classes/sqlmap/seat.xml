@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+			PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+			"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="seat">
+	
+	<resultMap class="daily.seat.vo.SeatVO" id="seatMap">
+		<result property="cafeSeatNo" column="CAFE_SEAT_NO" />
+		<result property="cafeNo" column="CAFE_NO" />
+		<result property="seatNo" column="SEAT_NO" />
+		<result property="seatXPosition" column="SEAT_X_POSITION" />
+		<result property="seatYPosition" column="SEAT_Y_POSITION" />
+		<result property="seatCode" column="SEAT_CODE" />
+		<result property="seatUsableYn" column="SEAT_USABLE_YN" />
+		<result property="seatUsingYn" column="SEAT_USING_YN" />
+	</resultMap>
+	
+	<!-- 지점 번호 입력 시 지점의 좌석 리스트 가져오기 --> 
+	<select id="getSeatList" resultMap="seatMap">
+		SELECT * 
+		FROM TB_SEAT
+		WHERE CAFE_NO = #cafeNo# 
+			AND SEAT_CODE = #seatCode#
+		<isNotEmpty property="seatUsingYn">
+			AND SEAT_USING_YN = #seatUsingYn#
+		</isNotEmpty>  
+		<isNotEmpty property="seatUsingYn">
+			AND SEAT_X_POSITION = #seatXPosition#
+		</isNotEmpty>  
+		<isNotEmpty property="seatUsingYn">
+			AND SEAT_Y_POSITION = #seatYPosition#
+		</isNotEmpty>
+		ORDER BY CAFE_SEAT_NO 
+	</select>
+	
+	<!-- 지점 좌석 추가 -->
+	<!-- (seatCode 01-개인석 / 02-스터디룸) --> 
+	<insert id="insertSeat" parameterClass="daily.seat.vo.SeatVO">
+		INSERT INTO TB_SEAT (
+			CAFE_SEAT_NO
+			,CAFE_NO
+			,SEAT_NO
+			,SEAT_X_POSITION
+			,SEAT_Y_POSITION
+			,SEAT_CODE
+			)
+		VALUES (
+			SEQ_CAFE_SEAT_NO.NEXTVAL
+			,#cafeNo#        
+			,#seatNo#        
+			,#seatXPosition#
+			,#seatYPosition# 
+			,#seatCode#  
+		)
+	</insert>
+	
+	<!-- 지점 좌석 삭제 -->
+	<delete id="deleteSeat" parameterClass="daily.seat.vo.SeatVO">
+		DELETE FROM TB_SEAT
+		WHERE CAFE_NO = #cafeNo#
+		<isNotEmpty property="seatNo">
+			AND CAFE_SEAT_NO = #cafeSeatNo# 
+		</isNotEmpty>
+		<isNotEmpty property="seatUsingYn">
+			AND SEAT_X_POSITION = #seatXPosition#
+		</isNotEmpty>  
+		<isNotEmpty property="seatUsingYn">
+			AND SEAT_Y_POSITION = #seatYPosition#
+		</isNotEmpty>  
+	</delete>
+	
+	<!-- 지점 좌석 정보 수정 -->
+	<update id="updateSeat" parameterClass="daily.seat.vo.SeatVO">
+		UPDATE TB_SEAT SET
+		<isNotEmpty property="seatUsableYn">
+			SEAT_USABLE_YN = #seatUsableYn#
+		</isNotEmpty>  
+		<isNotEmpty property="seatUsingYn">
+			SEAT_USING_YN = #seatUsableYn#
+		</isNotEmpty>  
+		<isNotEmpty property="seatNo">
+			SEAT_NO = #seatNo#
+		</isNotEmpty>  
+		WHERE CAFE_SEAT_NO = #cafeSeatNo#  
+	</update>
+	
+	<!-- 지점 좌석 정보 수정 - 한번에 여러 SeatNo 업데이트 -->
+	<update id="updateSeatNo" parameterClass="String">
+		{CALL
+			DECLARE
+			BEGIN
+				$sqlString$
+			END
+		}
+	</update>
+	
+	
+	
+	
+	
+</sqlMap>

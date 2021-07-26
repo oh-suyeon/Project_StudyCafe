@@ -1,0 +1,44 @@
+@charset "UTF-8";
+
+/**nav1**/
+.navbar {
+	margin-bottom: 0;
+	border-radius: 0;
+}
+
+#logo {
+	font-weight: 900;
+	color: black;
+}
+
+#logo:hover {
+	color: gray;
+}
+
+.icon-bar { 
+	background-color: black; 
+} 
+
+.navbar-nav>li>a {
+	color: black;
+}
+
+.navbar-nav>li>a:hover {
+		color: gray; 
+		background-color: white;
+}
+
+/**navi2**/
+#divSecondNavbar {
+	padding-left: 30%; /*가운데 정렬 방법을 못 찾아 임시방편*/
+}
+
+/**footer**/
+footer {
+	font-weight: 300;
+	font-size: 0.8em;
+	padding: 25px;
+}
+footer p {
+	margin: 0px;
+}

@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+			PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+			"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="notice">
+	
+	<resultMap class="daily.notice.vo.NoticeVO" id="noticeMap">
+		<result column="NOTICE_NO" property="noticeNo"/>
+		<result column="CAFE_NO" property="cafeNo"/>
+		<result column="NOTICE_REG_DATE" property="noticeRegDate"/>
+		<result column="NOTICE_TITLE" property="noticeTitle"/>
+		<result column="NOTICE_CONTENT" property="noticeContent"/>
+		<result column="ATCH_FILE_ID" property="atchFileId" nullValue="-1" />
+		<result column="BOARD_CODE" property="boardCode"/>
+	</resultMap>
+	
+	<!-- 전체 또는 지점 별 공지사항 리스트 출력 -->
+	<!-- cafeNo가 들어오지 않으면 전체 공지사항 -->	
+	<select id="getNoticeList" resultMap="noticeMap">
+		SELECT AA.*
+		FROM
+			(SELECT A.*, ROWNUM AS RNUM
+			FROM 
+				(SELECT 
+					NOTICE_NO                				
+					,CAFE_NO                  				
+					,TO_CHAR(NOTICE_REG_DATE, 'YYYY-MM-DD') NOTICE_REG_DATE
+					,NOTICE_TITLE            				
+					,NOTICE_CONTENT          				
+					,ATCH_FILE_ID           				
+					,FN_GETCODENAME('C01', BOARD_CODE) BOARD_CODE              				
+				FROM TB_NOTICE 
+				WHERE 1=1 
+					<isEmpty property="cafeNo">
+						AND CAFE_NO IS NULL
+					</isEmpty>
+					<isNotEmpty property="cafeNo">
+						AND CAFE_NO = #cafeNo#
+					</isNotEmpty>
+				ORDER BY NOTICE_NO DESC) A) AA
+		WHERE AA.RNUM BETWEEN #firstRecNo# AND #lastRecNo#
+	</select>
+	
+	<!-- 검색 조건(제목/내용)에 따라 공지사항 리스트 출력 -->
+	<select id="searchNoticeList" resultMap="noticeMap">
+		SELECT AA.*
+		FROM
+			(SELECT A.*, ROWNUM AS RNUM
+			FROM 
+				(SELECT 
+					NOTICE_NO                				
+					,CAFE_NO                  				
+					,TO_CHAR(NOTICE_REG_DATE, 'YYYY-MM-DD') NOTICE_REG_DATE
+					,NOTICE_TITLE            				
+					,NOTICE_CONTENT          				
+					,ATCH_FILE_ID           				
+					,BOARD_CODE              				
+				FROM TB_NOTICE 
+				WHERE 1=1 
+					<isEmpty property="cafeNo">
+						AND CAFE_NO IS NULL
+					</isEmpty>
+					<isNotEmpty property="cafeNo">
+						AND CAFE_NO = #cafeNo#
+					</isNotEmpty>
+					<isNotEmpty property="noticeTitle">
+						AND NOTICE_TITLE LIKE '%' || #noticeTitle# || '%'
+					</isNotEmpty>
+					<isNotEmpty property="noticeContent">
+						AND NOTICE_CONTENT LIKE '%' || #noticeContent# || '%'
+					</isNotEmpty>
+					ORDER BY NOTICE_NO DESC) A) AA
+		WHERE AA.RNUM BETWEEN #firstRecNo# AND #lastRecNo#
+	</select>
+	
+	<!-- 리스트의 전체 게시글 수 읽기 -->
+	<!-- 페이징 처리 위해 필요 -->
+	<select id="getTotalCnt" resultClass="int">
+		SELECT COUNT(*) AS CNT
+		FROM TB_NOTICE
+		WHERE 1=1 
+			<isEmpty property="cafeNo">
+				AND CAFE_NO IS NULL
+			</isEmpty>
+			<isNotEmpty property="cafeNo">
+				AND CAFE_NO = #cafeNo#
+			</isNotEmpty>
+			<isNotEmpty property="noticeTitle">
+				AND NOTICE_TITLE LIKE '%' || #noticeTitle# || '%'
+			</isNotEmpty>
+			<isNotEmpty property="noticeContent">
+				AND NOTICE_CONTENT LIKE '%' || #noticeContent# || '%'
+			</isNotEmpty>
+	</select>
+	
+	<!-- 공지사항 게시글 읽기 -->	
+	<select id="getNotice" resultMap="noticeMap">
+		SELECT 
+			NOTICE_NO                				
+			,CAFE_NO                  				
+			,TO_CHAR(NOTICE_REG_DATE, 'YYYY-MM-DD') NOTICE_REG_DATE
+			,NOTICE_TITLE            				
+			,NOTICE_CONTENT          				
+			,ATCH_FILE_ID							
+			,BOARD_CODE              				
+		FROM TB_NOTICE 
+		WHERE NOTICE_NO = #noticeNo# 
+	</select>
+	
+	<!-- 공지사항 게시글 등록 -->
+	<insert id="insertNotice" parameterClass="daily.notice.vo.NoticeVO">
+		INSERT INTO TB_NOTICE (
+			NOTICE_NO
+			,CAFE_NO
+			,NOTICE_REG_DATE
+			,NOTICE_TITLE
+			,NOTICE_CONTENT
+			,ATCH_FILE_ID
+			)
+		VALUES (
+			SEQ_NOTICE_NO.NEXTVAL
+			,#cafeNo#       
+			,SYSDATE
+			,#noticeTitle#  
+			,#noticeContent#
+			,#atchFileId#   
+		)
+	</insert>
+	
+	<!-- 공지사항 게시글 수정 -->
+	<update id="updateNotice" parameterClass="daily.notice.vo.NoticeVO">
+		UPDATE TB_NOTICE SET
+			NOTICE_REG_DATE = SYSDATE
+			,NOTICE_TITLE = #noticeTitle#
+			,NOTICE_CONTENT = #noticeContent#
+			,ATCH_FILE_ID = #atchFileId#
+		WHERE NOTICE_NO = #noticeNo#
+	</update>
+	
+	<!-- 공지사항 게시글 삭제 -->
+	<delete id="deleteNotice" parameterClass="String">
+		DELETE FROM TB_NOTICE 
+		WHERE NOTICE_NO = #noticeNo# 
+	</delete>
+	
+</sqlMap>

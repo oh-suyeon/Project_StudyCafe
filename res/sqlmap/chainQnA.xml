@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+			PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+			"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="chainQnA">
+
+	<insert id="chainQInsert" parameterClass="chainQnAVO">
+		INSERT INTO TB_CHAIN_QNA
+		(
+			CHAIN_QNA_NO			
+			,USER_ID				
+			,WRITER_NAME			
+			,CHAIN_QNA_PW			
+			,CHAIN_QNA_TITLE		
+			,CHAIN_QNA_CONTENT		
+			,CHAIN_QNA_HP			
+			,CHAIN_QNA_SIDO			
+			,CHAIN_QNA_REG_DATE		
+			,CHAIN_QNA_QA			
+		)
+		VALUES
+		(
+			SEQ_CHAIN_QNA_NO.NEXTVAL
+			,#userId#
+			,#writerName#
+			,#chainQnaPw#
+			,#chainQnaTitle#
+			,#chainQnaContent#
+			,#chainQnaHp#
+			,#chainQnaSido#
+			,SYSDATE
+			,'Q'
+		)
+	</insert>
+	
+	<select id="getTotalCnt" resultClass="int">
+		SELECT COUNT(*) AS CNT
+		FROM TB_CHAIN_QNA
+		WHERE CHAIN_QNA_QA = 'Q'
+	</select>
+	
+	<select id="selectQnAList" parameterClass="pagingVO" resultClass="chainQnAVO">
+		SELECT AA.*
+		FROM (SELECT A.*, ROWNUM AS RNUM
+			  FROM (SELECT CHAIN_QNA_NO			     chainQnaNo			
+					,USER_ID				 userId				
+					,WRITER_NAME			 writerName			
+					,CHAIN_QNA_PW			 chainQnaPw			
+					,CHAIN_QNA_TITLE		 chainQnaTitle		
+					,CHAIN_QNA_CONTENT		 chainQnaContent		
+					,CHAIN_QNA_HP			 chainQnaHp			
+					,CHAIN_QNA_SIDO			 chainQnaSido			
+					,CHAIN_QNA_REG_DATE		 chainQnaRegDate		
+					,CHAIN_QNA_QA            chainQnaQa
+					,CHAIN_QNA_Q_NO          chainQnaQNo
+					,BOARD_CODE	             boardCode
+					FROM TB_CHAIN_QNA
+					WHERE CHAIN_QNA_QA = 'Q'
+					ORDER BY CHAIN_QNA_NO DESC) A) AA
+		WHERE AA.RNUM BETWEEN #firstRecNo# AND #lastRecNo#
+		
+		
+	</select>
+	
+	<select id="selectQnADetail" parameterClass="String" resultClass="chainQnAVO">
+		SELECT CHAIN_QNA_NO			     chainQnaNo			
+				,USER_ID				 userId				
+				,WRITER_NAME			 writerName			
+				,CHAIN_QNA_PW			 chainQnaPw			
+				,CHAIN_QNA_TITLE		 chainQnaTitle		
+				,CHAIN_QNA_CONTENT		 chainQnaContent		
+				,CHAIN_QNA_HP			 chainQnaHp			
+				,CHAIN_QNA_SIDO			 chainQnaSido			
+				,CHAIN_QNA_REG_DATE		 chainQnaRegDate		
+				,CHAIN_QNA_QA            chainQnaQa
+				,CHAIN_QNA_Q_NO          chainQnaQNo
+				,BOARD_CODE	             boardCode
+		FROM TB_CHAIN_QNA
+		WHERE CHAIN_QNA_NO = #chainQnaNo#
+	
+	</select>
+	
+	<update id="updateQnA" parameterClass="chainQnAVO">
+		UPDATE TB_CHAIN_QNA
+		SET 	USER_ID = #userId#				
+				,WRITER_NAME = #writerName#			
+				,CHAIN_QNA_TITLE =  #chainQnaTitle#		
+				,CHAIN_QNA_CONTENT = #chainQnaContent#		
+				,CHAIN_QNA_HP = #chainQnaHp#			
+				,CHAIN_QNA_SIDO = #chainQnaSido#			
+				,CHAIN_QNA_REG_DATE = SYSDATE
+		WHERE 	CHAIN_QNA_NO = #chainQnaNo#
+	</update>
+	
+	<delete id="deleteQnA" parameterClass="String">
+		DELETE FROM TB_CHAIN_QNA
+		WHERE CHAIN_QNA_NO = #chainQnaNo#
+	</delete>
+	
+	<insert id="chainAInsert" parameterClass="chainQnAVO">
+	INSERT INTO TB_CHAIN_QNA
+		(
+			CHAIN_QNA_NO						
+			,WRITER_NAME					
+			,CHAIN_QNA_TITLE						
+			,CHAIN_QNA_REG_DATE		
+			,CHAIN_QNA_QA		
+			,CHAIN_QNA_Q_NO	
+		)
+		VALUES
+		(
+			SEQ_CHAIN_QNA_NO.NEXTVAL
+			,'관리자'
+			,#chainQnaTitle#
+			,SYSDATE
+			,'A'
+			,#chainQnaQNo#
+		)
+	</insert>
+	
+	<select id="selectAList" parameterClass="String" resultClass="chainQnAVO">
+	SELECT CHAIN_QNA_NO			     chainQnaNo			
+			,WRITER_NAME			 writerName			
+			,CHAIN_QNA_TITLE		 chainQnaTitle		
+			,CHAIN_QNA_REG_DATE		 chainQnaRegDate		
+			,CHAIN_QNA_Q_NO          chainQnaQNo
+			FROM TB_CHAIN_QNA
+			WHERE CHAIN_QNA_QA = 'A'
+			AND CHAIN_QNA_Q_NO = #chainQnANo#
+			ORDER BY CHAIN_QNA_NO DESC
+	</select>
+	
+	<update id="updateA" parameterClass="chainQnAVO">
+		UPDATE TB_CHAIN_QNA
+		SET		CHAIN_QNA_TITLE =  #chainQnaTitle#		
+				,CHAIN_QNA_REG_DATE = SYSDATE
+		WHERE 	CHAIN_QNA_NO = #chainQnaNo#
+	</update>
+	
+	<delete id="deleteA">
+		DELETE FROM TB_CHAIN_QNA
+		WHERE CHAIN_QNA_Q_NO = #chainQnaNo#
+	</delete>
+	
+	<select id="selectChkPw" resultClass="chainQnAVO">
+		SELECT *
+		FROM TB_CHAIN_QNA
+		WHERE CHAIN_QNA_PW = #inputPw#
+		AND CHAIN_QNA_NO = #qnaNo#
+	</select>
+	
+	<select id="searchQnAList" parameterClass="chainQnAVO">
+		SELECT *
+		FROM TB_CHAIN_QNA
+		WHERE 1=1
+		AND CHAIN_QNA_QA = 'Q'
+		<isNotEmpty property="chainQnaTitle">
+			AND CHAIN_QNA_TITLE LIKE '%' || #chainQnaTitle# || '%'
+		</isNotEmpty>
+		<isNotEmpty property="chainQnaContent">
+			AND CHAIN_QNA_CONTENT LIKE '%' || #chainQnaContent# || '%'
+		</isNotEmpty>
+	</select>
+</sqlMap>

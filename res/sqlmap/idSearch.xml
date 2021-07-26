@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+			PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+			"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="idSearch">
+
+	<select id="searchId" parameterClass="userVO" resultClass="userVO">
+		SELECT
+		USER_ID			userId
+		FROM TB_USER
+		WHERE USER_NAME = #userName#
+		AND USER_EMAIL = #userEmail#
+	</select>
+	
+	<select id="selectIdEmail" parameterClass="String" resultClass="userVO">
+		SELECT USER_PW	userPw
+			   ,USER_ID userId
+			   ,USER_EMAIL userEmail
+		FROM TB_USER
+		WHERE USER_ID = #userId#
+	</select>
+	
+	<update id="updatePw" parameterClass="userVO">
+		UPDATE TB_USER
+		SET USER_PW = #userPw#
+		WHERE USER_ID = #userId#
+	</update>
+</sqlMap>			

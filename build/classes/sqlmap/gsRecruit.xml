@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+			PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+			"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="gsRecruit">
+
+
+	<update id="updateGs"> <!--  parameterClass는 굳이 안적어도됨 -->
+	
+		UPDATE TB_GS_RECRUIT
+		SET GS_BOARD_TITLE = #gsBoardTitle#
+		,GS_NAME = #gsName#
+		,GS_LEADER = #gsLeader#
+		,GS_MEMBER_CNT = #gsMemberCnt#
+		,GS_START_DATE = #gsStartDate#
+		,GS_END_DATE = #gsEndDate#
+		,GS_BOARD_CONTENT = #gsBoardContent#
+		,GS_OPEN_YN = #gsOpenYn#
+		,GS_PW = #gsPw#
+		WHERE GS_RECRUIT_NO = #gsRecruitNo#
+	
+	</update> 
+
+	<delete id="deleteGs" parameterClass="String">
+		
+		DELETE FROM TB_GS_RECRUIT WHERE GS_RECRUIT_NO = #gsRecruitNo#
+		
+	</delete>
+
+	<insert id="insertGs" parameterClass="daily.gsRecruit.vo.GsRecruitVO">
+	
+	INSERT INTO TB_GS_RECRUIT (GS_RECRUIT_NO
+	,GS_BOARD_TITLE
+	,GS_NAME
+	,GS_LEADER
+	,GS_MEMBER_CNT
+	,GS_START_DATE
+	,GS_END_DATE
+	,GS_BOARD_CONTENT
+	,GS_REG_DATE
+	,GS_OPEN_YN
+	,GS_PW)
+	VALUES (SEQ_GS_RECRUIT_NO.NEXTVAL
+	,#gsBoardTitle#
+	,#gsName#
+	,#gsLeader#
+	,#gsMemberCnt#
+	,TO_DATE(#gsStartDate#, 'YYYY-MM-DD')
+	,TO_DATE(#gsEndDate#, 'YYYY-MM-DD')
+	,#gsBoardContent#
+	,SYSDATE
+	,#gsOpenYn#
+	,#gsPw#)
+	</insert>
+
+	<resultMap class="gsRecruitVO"       id="gsRecruitMap">
+		<result property="gsRecruitNo"   column="gs_recruit_no"/>
+		<result property="gsBoardTitle"  column="gs_board_title"/>
+		<result property="gsName"        column="gs_name"/>
+		<result property="gsLeader"      column="gs_leader"/>
+		<result property="gsMemberCnt"    column="gs_member_cnt"/>
+		<result property="gsStartDate"   column="gs_start_date"/>
+		<result property="gsEndDate"     column="gs_end_date"/>
+		<result property="gsBoardContent" column="gs_board_content"/>
+		<result property="gsRegDate"     column="gs_reg_date"/>
+		<result property="gsOpenYn"      column="gs_open_yn"/>
+		<result property="gsPw"          column="gs_pw"/>
+		<result property="boardCode"     column="board_code"/>
+
+	</resultMap>
+	
+	<select id="searchGsRecruit">
+	SELECT AA.*
+		FROM
+			(SELECT A.*, ROWNUM AS RNUM
+			FROM 
+				(SELECT 
+				 GS_RECRUIT_NO
+		          ,GS_BOARD_TITLE 
+		          ,GS_NAME
+		          ,GS_LEADER
+		          ,GS_MEMBER_CNT 
+		          ,GS_START_DATE 
+		          ,GS_END_DATE 
+		          ,GS_BOARD_CONTENT 
+		          ,GS_REG_DATE 
+		          ,GS_OPEN_YN
+		          ,GS_PW
+		          ,BOARD_CODE	           				
+				FROM TB_GS_RECRUIT 
+				WHERE 1=1 
+					<isNotEmpty property="gsBoardTitle">
+						AND GS_BOARD_TITLE LIKE '%' || #gsBoardTitle# || '%'
+					</isNotEmpty>
+					<isNotEmpty property="gsBoardContent">
+						AND GS_BOARD_CONTENT LIKE '%' || #gsBoardContent# || '%'
+					</isNotEmpty>
+					<isNotEmpty property="gsLeader">
+						AND GS_LEADER LIKE '%' || #gsLeader# || '%'
+					</isNotEmpty>) A) AA
+		WHERE AA.RNUM BETWEEN #firstRecNo# AND #lastRecNo#
+	</select>
+	
+	<select id="getAllGsRecruitList" resultMap="gsRecruitMap">
+		
+		SELECT AA.*
+		FROM 
+		(SELECT A.*,ROWNUM AS RNUM
+		FROM
+		(SELECT GS_RECRUIT_NO
+		          ,GS_BOARD_TITLE 
+		          ,GS_NAME
+		          ,GS_LEADER
+		          ,GS_MEMBER_CNT 
+		          ,GS_START_DATE 
+		          ,GS_END_DATE 
+		          ,GS_BOARD_CONTENT 
+		          ,TO_CHAR(GS_REG_DATE, 'YYYY-MM-DD') GS_REG_DATE
+		          ,GS_OPEN_YN
+		          ,GS_PW
+		          ,BOARD_CODE		           
+		FROM TB_GS_RECRUIT
+		ORDER BY GS_RECRUIT_NO DESC) A) AA
+		WHERE AA.RNUM BETWEEN #firstRecNo# AND #lastRecNo#
+	
+	</select>
+
+	
+	<select id="getGsRecruit" resultMap="gsRecruitMap">
+   
+      SELECT * FROM TB_GS_RECRUIT
+      WHERE GS_RECRUIT_NO = #gsRecruitNo#
+   
+   </select>
+   
+	<select id="getTotalCnt" resultClass="int">
+		
+		SELECT COUNT(*) AS CNT 
+		FROM TB_GS_RECRUIT
+		
+	</select>
+</sqlMap>
